@@ -1,33 +1,56 @@
+import streamlit as st
 import cv2
 from mtcnn import MTCNN
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
-import os
-import streamlit as st
+import numpy as np
 
 
-uploaded_file_img = st.sidebar.file_uploader("Selecione uma imagem", type="jpg")
-uploaded_file_video = st.sidebar.file_uploader("Selecione um vídeo", type=["mp4"])
-
-if uploaded_file_img is not None:
-    st.image(uploaded_file_img)
-
-if uploaded_file_video is not None:
-    # Usado para capturar vídeo de uma fonte de entrada, como uma câmera de vídeo ou um arquivo de vídeo.
-    cap = cv2.VideoCapture(str(uploaded_file_video.name))
-    # Cria um objeto de detecção de faces, que pode ser usado para detectar faces em imagens.
+def detect_faces(image):
     detector = MTCNN()
+    result = detector.detect_faces(image)
+    for face in result:
+        x, y, width, height = face['box']
+        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
+    return image
 
-    while True:
-        # Ler cada quadro da câmera/vídeo
+
+def detect_faces_video(video_file):
+    detector = MTCNN()
+    cap = cv2.VideoCapture(video_file)
+    while cap.isOpened():
+        # Lê um frame do vídeo
         ret, frame = cap.read()
-        # Função para detectar as faces na imagem
-        output = detector.detect_faces(frame)
+        if not ret:
+            break
 
-        for single_output in output:
-            # Extrai as informações de caixa delimitadora (box) do dicionário single_output e as atribui às variáveis x, y, width e height.
-            x, y, width, height = single_output['box']
-            # Desenha um retângulo ao redor da face detectada na imagem
-            cv2.rectangle(frame, pt1=(x, y), pt2=(x + width, y + height), color=(255, 0, 0), thickness=3)
-        st.video(frame)
+            # Detecta as faces no frame
+        result = detector.detect_faces(frame)
 
+        # Desenha um retângulo em volta de cada face detectada
+        for face in result:
+            x, y, width, height = face['box']
+            cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
+
+        # Exibe o frame processado
+        cv2.imshow('Frame', frame)
+
+        # Espera por um evento de teclado
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+def main():
+    uploaded_file = st.sidebar.file_uploader("Carregue uma imagem", type=["jpg", "jpeg", "png"])
+    video_file = st.file_uploader('Selecione um vídeo', type=['mp4', 'avi'])
+    if uploaded_file is not None:
+        # decodificar uma imagem codificada em um formato específico em uma imagem OpenCV
+        image = cv2.imdecode(np.fromstring(uploaded_file.read(), np.uint8), 1)
+        image = detect_faces(image)
+        st.image(image, channels="BGR")
+    elif video_file is not None:
+        detect_faces_video(video_file)
+
+
+if __name__ == "__main__":
+    main()
