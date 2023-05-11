@@ -1,52 +1,42 @@
-import cv2
 import streamlit as st
+import cv2
+import numpy as np
+from mtcnn import MTCNN
+import io
 
 
-def process_video(video_file):
-    # Carrega o vídeo
-    video_capture = cv2.VideoCapture(video_file.name)
-
-    # Define o modelo de detecção de rostos
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-    # Processa cada quadro do vídeo
-    while True:
-        # Lê um quadro do vídeo
-        ret, frame = video_capture.read()
-
-        # Verifica se a leitura do quadro foi bem sucedida
+def detect_faces_video(video):
+    detector = MTCNN()
+    while video.isOpened():
+        ret, frame = video.read()
         if not ret:
             break
-
-        # Converte o quadro para escala de cinza para facilitar a detecção de rostos
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # Detecta os rostos no quadro
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-
-        # Desenha um retângulo em volta de cada rosto detectado
-        for (x, y, w, h) in faces:
+        result = detector.detect_faces(frame)
+        for face in result:
+            x, y, w, h = face['box']
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-        # Mostra o quadro processado na janela de saída
-        cv2.imshow('Video', frame)
-
-        # Verifica se o usuário pressionou a tecla 'q' para sair
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    # Libera os recursos e fecha as janelas
-    video_capture.release()
-    cv2.destroyAllWindows()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        yield frame
 
 
-# Define o título do aplicativo
-st.title('Identificação de Rostos em Vídeo')
+def main():
+    st.title("Detector de faces em vídeo com MTCNN")
 
-# Adiciona um seletor de arquivos para permitir que o usuário carregue um vídeo
-video_file = st.file_uploader('Selecione um arquivo de vídeo', type=['mp4', 'avi'])
+    # Carrega o vídeo
+    uploaded_file = st.file_uploader("Escolha um vídeo", type=["mp4"])
+    if uploaded_file is not None:
+        video = cv2.VideoCapture('https://vod-progressive.akamaized.net/exp=1683822149~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F4428%2F15%2F397143934%2F1690405210.mp4~hmac=7e9d3739a29c9333e7d4184231f7c06e45094b985cf0589cb62b08d82a51078b/vimeo-prod-skyfire-std-us/01/4428/15/397143934/1690405210.mp4', cv2.CAP_ANY)
+        video_generator = detect_faces_video(video)
 
-if video_file is not None:
-    # Chama a função 'process_video' com o arquivo de vídeo selecionado
-    process_video(video_file)
+        # Exibe o vídeo com as faces detectadas em tempo real
+        stframe = st.empty()
+        while True:
+            try:
+                frame = next(video_generator)
+                stframe.image(frame, channels="RGB")
+            except StopIteration:
+                break
 
+
+if __name__=="__main__":
+    main()
