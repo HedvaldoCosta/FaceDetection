@@ -19,24 +19,30 @@ def detect_faces_video(video):
 
 def main():
     st.title("Detector de faces em vídeo com MTCNN")
-
+    button_videos = st.button('Testar com vídeos')
+    button_img = st.button('Testar com imagens')
     # Carrega o vídeo
-    video_choice = {'video1': 'https://bit.ly/3pB4mmU',
-                    'video2': 'https://bit.ly/3LZSIZY',
-                    'video3': 'https://bit.ly/453LTzA',
-                    'video4': 'https://bit.ly/42MTkch'}
-    select_video = st.sidebar.selectbox('Selecione um vídeo', video_choice.keys())
-    video = cv2.VideoCapture(video_choice[select_video])
-    video_generator = detect_faces_video(video)
+    if button_videos:
+        video_choice = {'video1': 'https://bit.ly/3pB4mmU',
+                        'video2': 'https://bit.ly/3LZSIZY',
+                        'video3': 'https://bit.ly/453LTzA',
+                        'video4': 'https://bit.ly/42MTkch'}
+        select_video = st.sidebar.selectbox('Selecione um vídeo', video_choice.keys())
+        video = cv2.VideoCapture(video_choice[select_video])
+        video_generator = detect_faces_video(video)
 
-    # Exibe o vídeo com as faces detectadas em tempo real
-    stframe = st.empty()
-    while True:
-        try:
-            frame = next(video_generator)
-            stframe.image(frame, channels="RGB")
-        except StopIteration:
-            break
+        # Exibe o vídeo com as faces detectadas em tempo real
+        stframe = st.empty()
+        while True:
+            try:
+                frame = next(video_generator)
+                stframe.image(frame, channels="RGB")
+            except StopIteration:
+                break
+            if button_img:
+                break
+    elif button_img:
+        st.info('É O MENININ DE PAPAI É?')
 
 
 if __name__=="__main__":
