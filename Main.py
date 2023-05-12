@@ -4,42 +4,47 @@ from mtcnn import MTCNN
 import numpy as np
 
 
-def detect_faces(image):
-    detector = MTCNN()
-    result = detector.detect_faces(image)
-    for face in result:
-        x, y, width, height = face['box']
-        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
-    return image
+class FaceDetection:
+    def __init__(self, file_image=None, file_video=None):
+        self.image = file_image
+        self.video = file_video
+        self.detector = MTCNN()
+
+    def detecting_faces_images(self):
+        result_img = self.detector.detect_faces(self.image)
+        for faces in result_img:
+            x, y, width, height = faces["box"]
+            cv2.rectangle(self.image, (x, y), (x + width, y + height), (0, 0, 255), 2)
+        return self.image
+
+    def detecting_faces_videos(self):
+        while self.video.isOpened():
+            ret, frame = self.video.read()
+            if not ret:
+                break
+            result_video = self.detector.detect_faces(frame)
+            for faces in result_video:
+                x, y, width, height = faces["box"]
+                cv2.Rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 2)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            # Usado para iterar sobre uma sequência de valores.
+            yield frame
 
 
-def detect_faces_video(video):
-    detector = MTCNN()
-    while video.isOpened():
-        ret, frame = video.read()
-        if not ret:
-            break
-        result = detector.detect_faces(frame)
-        for face in result:
-            x, y, w, h = face['box']
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        yield frame
-
-
-def main():
-    st.title("Detector de faces em vídeo com MTCNN")
-    # Carrega o vídeo
-    video_choice = {'': '',
-                    'video1': 'https://bit.ly/3pB4mmU',
-                    'video2': 'https://bit.ly/3LZSIZY',
-                    'video3': 'https://bit.ly/453LTzA',
-                    'video4': 'https://bit.ly/42MTkch'}
+if __name__=="__main__":
+    st.title("Detector de faces com MTCNN")
+    video_choice = {
+        '': '',
+        'video1': 'https://bit.ly/3pB4mmU',
+        'video2': 'https://bit.ly/3LZSIZY',
+        'video3': 'https://bit.ly/453LTzA',
+        'video4': 'https://bit.ly/42MTkch'
+    }
     select_video = st.sidebar.selectbox('Selecione um vídeo', video_choice.keys())
     video = cv2.VideoCapture(video_choice[select_video])
-    video_generator = detect_faces_video(video)
+    face_detection_video = FaceDetection(file_video=video)
+    video_generator = face_detection_video.detecting_faces_videos()
 
-    # Exibe o vídeo com as faces detectadas em tempo real
     stframe = st.empty()
     while True:
         try:
@@ -48,13 +53,9 @@ def main():
         except StopIteration:
             break
 
-    uploaded_file = st.sidebar.file_uploader("Carregue uma imagem", type=["jpg", "jpeg", "png"])
-    if uploaded_file is not None:
-        # decodificar uma imagem codificada em um formato específico em uma imagem OpenCV
-        image = cv2.imdecode(np.fromstring(uploaded_file.read(), np.uint8), 1)
-        image = detect_faces(image)
+    uploaded_file_img = st.sidebar.file_uploader("Carregue uma imagem", type=["jpg", "jpeg", "png"])
+    if uploaded_file_img is not None:
+        image = cv2.imdecode(np.fromstring(uploaded_file_img.read(), np.uint8), 1)
+        face_detection_img = FaceDetection(file_image=image)
+        image = face_detection_img.detecting_faces_images()
         st.image(image, channels="BGR")
-
-
-if __name__=="__main__":
-    main()
