@@ -31,10 +31,8 @@ def main():
     st.title("Detector de faces em vídeo com MTCNN")
     # Carrega o vídeo
     video_choice = {'': '',
-                    'video1': 'https://bit.ly/3pB4mmU',
-                    'video2': 'https://bit.ly/3LZSIZY',
-                    'video3': 'https://bit.ly/453LTzA',
-                    'video4': 'https://bit.ly/42MTkch'}
+                    'video1': 'https://vod-progressive.akamaized.net/exp=1684258090~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F1512%2F8%2F207561527%2F708213660.mp4~hmac=1a2d0cd446430e6b40c5e7d4b3443fc4a443171a68865db53a1ac83e4c97b127/vimeo-prod-skyfire-std-us/01/1512/8/207561527/708213660.mp4',
+                    }
     select_video = st.sidebar.selectbox('Selecione um vídeo', video_choice.keys())
     video = cv2.VideoCapture(video_choice[select_video])
     video_generator = detect_faces_video(video)
