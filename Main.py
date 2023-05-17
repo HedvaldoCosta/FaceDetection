@@ -9,7 +9,7 @@ def detect_faces(image):
     result = detector.detect_faces(image)
     for face in result:
         x, y, width, height = face['box']
-        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
+        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 0, 255), 2)
     return image
 
 
@@ -22,16 +22,19 @@ def detect_faces_video(video):
         result = detector.detect_faces(frame)
         for face in result:
             x, y, w, h = face['box']
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         yield frame
 
 
 def main():
-    st.title("Detector de faces em vídeo com MTCNN")
+    st.title("DETECTOR DE FACES")
     # Carrega o vídeo
     video_choice = {'': '',
-                    'video1': 'https://vod-progressive.akamaized.net/exp=1684258090~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F1512%2F8%2F207561527%2F708213660.mp4~hmac=1a2d0cd446430e6b40c5e7d4b3443fc4a443171a68865db53a1ac83e4c97b127/vimeo-prod-skyfire-std-us/01/1512/8/207561527/708213660.mp4',
+                    'video1': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/fb1e4a18-cbbd-4bfd-8303-940714912c10',
+                    'video2': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/1b662c17-579d-4326-beb2-fb30d6d3034f',
+                    'video3': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/924cec28-e115-4c13-8d7e-c4d48dc47ac5',
+                    'video4': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/116ef041-a81a-4a5a-86d8-106c67e86dd6'
                     }
     select_video = st.sidebar.selectbox('Selecione um vídeo', video_choice.keys())
     video = cv2.VideoCapture(video_choice[select_video])
@@ -54,5 +57,5 @@ def main():
         st.image(image, channels="BGR")
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
