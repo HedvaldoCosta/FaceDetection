@@ -1,72 +1,36 @@
+# Bibliotecas necessárias para a execução do código
 import streamlit as st
 import cv2
 from mtcnn import MTCNN
 import numpy as np
 
 
-def detect_faces(image):
-    detector = MTCNN()
-    result = detector.detect_faces(image)
-    for face in result:
-        x, y, width, height = face['box']
-        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 0, 255), 2)
-    return image
+class FaceDetection:
+    def __init__(self, file_image='', file_video=''):
+        self.detector = MTCNN()
+        self.image = file_image
+        self.video = file_video
 
+    def detecting_faces_image(self):
+        result = self.detector.detect_faces(self.image)
+        for faces in result:
+            x, y, width, height = faces['box']
+            cv2.rectangle(self.image, (x, y), (x + width, y + height), (0, 0, 255), 2)
+        return self.image
 
-def detect_faces_video(video):
-    detector = MTCNN()
-    while video.isOpened():
-        ret, frame = video.read()
-        if not ret:
-            break
-        result = detector.detect_faces(frame)
-        for face in result:
-            x, y, w, h = face['box']
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        yield frame
-
-
-def main():
-    # Carrega o vídeo
-    video_choice = {'': '',
-                    'video1': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/fb1e4a18-cbbd-4bfd-8303-940714912c10',
-                    'video2': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/1b662c17-579d-4326-beb2-fb30d6d3034f',
-                    'video3': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/924cec28-e115-4c13-8d7e-c4d48dc47ac5',
-                    'video4': 'https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/116ef041-a81a-4a5a-86d8-106c67e86dd6'
-                    }
-    st.sidebar.title("SELECIONE UM VÍDEO")
-    select_video = st.sidebar.selectbox('', video_choice.keys())
-
-    button_video = st.sidebar.button("PARAR O VÍDEO")
-    if button_video:
-        select_video = ''
-    if select_video != '':
-        st.title("BUSCANDO ROSTOS")
-        video = cv2.VideoCapture(video_choice[select_video])
-        video_generator = detect_faces_video(video)
-
-        # Exibe o vídeo com as faces detectadas em tempo real
-        stframe = st.empty()
-        while True:
-            try:
-                frame = next(video_generator)
-                stframe.image(frame, channels="RGB")
-            except StopIteration:
+    def detecting_faces_video(self):
+        while self.video.isOpened():
+            ret, frame = self.video.read()
+            if not ret:
                 break
-    st.sidebar.title("SELECIONE UMA IMAGEM")
-    uploaded_file = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
-    if uploaded_file is not None:
-        st.title("ROSTO IDENTIFICADO")
-        # decodificar uma imagem codificada em um formato específico em uma imagem OpenCV
-        image = cv2.imdecode(np.fromstring(uploaded_file.read(), np.uint8), 1)
-        image = detect_faces(image)
-        st.image(image, channels="BGR")
-    st.sidebar.title("WEBCAM")
-    webcam = st.sidebar.button("Iniciar WEBCAM")
-    if webcam:
-        st.sidebar.text("Pressione a tecla q para parar a webcam.")
-        detector = MTCNN()
+            result = self.detector.detect_faces(frame)
+            for face in result:
+                x, y, w, h = face['box']
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            yield frame
+
+    def detecting_faces_webcam(self):
         cap = cv2.VideoCapture(0)
         while True:
             ret, frame = cap.read()
@@ -74,7 +38,7 @@ def main():
                 break
 
             # Detecção de rosto usando MTCNN
-            results = detector.detect_faces(frame)
+            results = self.detector.detect_faces(frame)
 
             # Desenhar retângulos em torno dos rostos detectados
             for result in results:
@@ -93,5 +57,39 @@ def main():
         cv2.destroyAllWindows()
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    # ________________________________PARTE PARA A EXECUÇÃO DE VÍDEOS________________________________
+    video_choice = {'Vídeo 1': 'https://bit.ly/436YGiF',
+                    'Vídeo 2': 'https://bit.ly/45bh5wJ',
+                    'Vídeo 3': 'https://bit.ly/3Oneg5H',
+                    'Vídeo 4': 'https://bit.ly/42POU4R'}
+    st.sidebar.title("ESCOLHA UM VÍDEO")
+    select_video = st.sidebar.selectbox('', video_choice.keys())
+    start_video_button = st.sidebar.button("INICIAR")
+    if start_video_button:
+        video = cv2.VideoCapture(video_choice[select_video])
+        face_detection_video = FaceDetection(file_video=video)
+        video_generator = face_detection_video.detecting_faces_video()
+        stframe = st.empty()
+        while True:
+            try:
+                frame = next(video_generator)
+                stframe.image(frame, channels="RGB")
+            except StopIteration:
+                break
+
+    # ________________________________PARTE PARA A EXECUÇÃO DE IMAGENS________________________________
+    st.sidebar.title("ESCOLHA UMA IMAGEM")
+    upload_image = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
+    if upload_image is not None:
+        image = cv2.imdecode(np.fromstring(upload_image.read(), np.uint8), 1)
+        face_detection_image = FaceDetection(file_image=image)
+        image_generator = face_detection_image.detecting_faces_image()
+        st.image(image_generator, channels="BGR")
+
+    # ________________________________PARTE PARA A EXECUÇÃO DA WEBCAM________________________________
+    st.sidebar.title("WEBCAM")
+    start_webcam_button = st.sidebar.button("INICIAR WEBCAM")
+    if start_webcam_button:
+        face_detection_webcam = FaceDetection()
+        face_detection_webcam.detecting_faces_webcam()
