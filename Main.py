@@ -88,3 +88,8 @@ if __name__ == '__main__':
         st.image(image_generator, channels="BGR")
 
     # ________________________________PARTE PARA A EXECUÇÃO DA WEBCAM________________________________
+    st.sidebar.title("WEBCAM")
+    start_webcam_button = st.sidebar.button("INICIAR WEBCAM")
+    if start_webcam_button:
+        face_detection_webcam = FaceDetection()
+        face_detection_webcam.detecting_faces_webcam()
