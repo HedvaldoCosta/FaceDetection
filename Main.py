@@ -15,7 +15,7 @@ class FaceDetection:
         result = self.detector.detect_faces(self.image)
         for faces in result:
             x, y, width, height = faces['box']
-            cv2.rectangle(self.image, (x, y), (x+width, y+height), (0, 0, 255), 2)
+            cv2.rectangle(self.image, (x, y), (x + width, y + height), (0, 0, 255), 2)
         return self.image
 
     def detecting_faces_video(self):
@@ -58,6 +58,7 @@ class FaceDetection:
 
 
 if __name__ == '__main__':
+    # ________________________________PARTE PARA A EXECUÇÃO DE VÍDEOS________________________________
     video_choice = {'Vídeo 1': 'https://bit.ly/436YGiF',
                     'Vídeo 2': 'https://bit.ly/45bh5wJ',
                     'Vídeo 3': 'https://bit.ly/3Oneg5H',
@@ -69,7 +70,6 @@ if __name__ == '__main__':
         video = cv2.VideoCapture(video_choice[select_video])
         face_detection_video = FaceDetection(file_video=video)
         video_generator = face_detection_video.detecting_faces_video()
-        # Exibe o vídeo com as faces detectadas em tempo real
         stframe = st.empty()
         while True:
             try:
@@ -78,7 +78,13 @@ if __name__ == '__main__':
             except StopIteration:
                 break
 
+    # ________________________________PARTE PARA A EXECUÇÃO DE IMAGENS________________________________
+    st.sidebar.title("ESCOLHA UMA IMAGEM")
+    upload_image = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
+    if upload_image is not None:
+        image = cv2.imdecode(np.fromstring(upload_image.read(), np.uint8), 1)
+        face_detection_image = FaceDetection(file_image=image)
+        image_generator = face_detection_image.detecting_faces_image()
+        st.image(image_generator, channels="BGR")
 
-
-
-
+    # ________________________________PARTE PARA A EXECUÇÃO DA WEBCAM________________________________
