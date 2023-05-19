@@ -61,7 +61,7 @@ class FaceDetection:
 if __name__ == '__main__':
     # ________________________________PARTE PARA A EXECUÇÃO DE VÍDEOS________________________________
     st.sidebar.title("ESCOLHA UM VÍDEO")
-    uploaded_file = st.sidebar.file_uploader("Selecione um arquivo de vídeo", type=["mp4", "avi"])
+    uploaded_file = st.sidebar.file_uploader("", type=["mp4", "avi"])
     if uploaded_file is not None:
         temp_file = tempfile.NamedTemporaryFile(delete=False)
         temp_file.write(uploaded_file.read())
@@ -77,6 +77,23 @@ if __name__ == '__main__':
                 stframe.image(frame, channels="RGB")
             except StopIteration:
                 break
+    st.sidebar.info("Sem arquivos? escolha aqui")
+    video_choice = {'PARAR': '',
+                    'Vídeo 1': 'https://bit.ly/436YGiF',
+                    'Vídeo 2': 'https://bit.ly/45bh5wJ',
+                    'Vídeo 3': 'https://bit.ly/3Oneg5H',
+                    'Vídeo 4': 'https://bit.ly/42POU4R'}
+    select_video = st.sidebar.selectbox('', video_choice.keys())
+    video = cv2.VideoCapture(video_choice[select_video])
+    face_detection_video = FaceDetection(file_video=video)
+    video_generator = face_detection_video.detecting_faces_video()
+    stframe = st.empty()
+    while True:
+        try:
+            frame = next(video_generator)
+            stframe.image(frame, channels="RGB")
+        except StopIteration:
+            break
 
     # ________________________________PARTE PARA A EXECUÇÃO DE IMAGENS________________________________
     st.sidebar.title("ESCOLHA UMA IMAGEM")
