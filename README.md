@@ -142,7 +142,82 @@ class FaceDetection:
 ````
 
 ````python
+if __name__ == '__main__':
+    # Criação de um título para vídeos na barra lateral
+    st.sidebar.title("ESCOLHA UM VÍDEO")
+    # Função que dá permissão ao usuário para carregar seus próprios vídeos
+    uploaded_file = st.sidebar.file_uploader("", type=["mp4", "avi"])
+    if uploaded_file is not None:
+        # Cria um arquivo temporário
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        # Escreve a string como Bytes no arquivo temporário
+        temp_file.write(uploaded_file.read())
+        # Recebe o nome do arquivo temporário e o fecha
+        video_path = temp_file.name
+        temp_file.close()
+        # Capturar fluxos de vídeo de arquivos de vídeo
+        video = cv2.VideoCapture(video_path)
+        # Retonar a classe FaceDetection recebendo o parâmetro "video"
+        face_detection_video = FaceDetection(file_video=video)
+        # Inicia a função para detecção em vídeos
+        video_generator = face_detection_video.detecting_faces_video()
+        # Criar e atualizar elementos de exibição interativos em aplicativos 
+        stframe = st.empty()
+        while True:
+            try:
+                # Obter o próximo quadro do vídeo
+                frame = next(video_generator)
+                # Exibir o quadro na interface
+                stframe.image(frame, channels="RGB")
+            # Indicar o final de uma iteração
+            except StopIteration:
+                break
+    # Possibilidade de testar vídeos já carregados dentro da aplicação
+    st.sidebar.info("Sem arquivos? escolha aqui")
+    video_choice = {'PARAR': '',
+                    'Vídeo 1': 'https://bit.ly/436YGiF',
+                    'Vídeo 2': 'https://bit.ly/45bh5wJ',
+                    'Vídeo 3': 'https://bit.ly/3Oneg5H',
+                    'Vídeo 4': 'https://bit.ly/42POU4R'}
+    select_video = st.sidebar.selectbox('', video_choice.keys())
+    video = cv2.VideoCapture(video_choice[select_video])
+    face_detection_video = FaceDetection(file_video=video)
+    video_generator = face_detection_video.detecting_faces_video()
+    stframe = st.empty()
+    while True:
+        try:
+            frame = next(video_generator)
+            stframe.image(frame, channels="RGB")
+        except StopIteration:
+            break
+````
 
+````python
+    # Criação de um título para imagens na barra lateral
+    st.sidebar.title("ESCOLHA UMA IMAGEM")
+    # Função para carregar imagens em seu próprio dispositivo
+    upload_image = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
+    if upload_image is not None:
+        # Decodificar e ler a imagem representada pelo array NumPy
+        image = cv2.imdecode(np.fromstring(upload_image.read(), np.uint8), 1)
+        # Chama a classe FaceDetection com o parâmetro "image"
+        face_detection_image = FaceDetection(file_image=image)
+        # Executa a função de detecção de faces em imagens
+        image_generator = face_detection_image.detecting_faces_image()
+        # Retorna a imagem na aplicação
+        st.image(image_generator, channels="BGR")
+````
+
+````python
+    # Criação de um título para a parte de webcam
+    st.sidebar.title("WEBCAM")
+    # Butão criado para iniciar a webcam
+    start_webcam_button = st.sidebar.button("INICIAR WEBCAM")
+    # Caso o botão seja apertado, irá chamar a classe FaceDetection executando a função
+    # para detecção de faces na webcam
+    if start_webcam_button:
+        face_detection_webcam = FaceDetection()
+        face_detection_webcam.detecting_faces_webcam()
 ````
 # SUMMARY
 
