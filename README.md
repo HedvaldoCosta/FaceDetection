@@ -77,7 +77,7 @@ class FaceDetection:
             # width e height. Essas informações representam as coordenadas e dimensões 
             # da caixa delimitadora (retângulo) ao redor da face detectada.
             x, y, width, height = faces['box']
-            #Desenha um retângulo na imagem original 
+            # Desenha um retângulo na imagem original 
             cv2.rectangle(self.image, (x, y), (x + width, y + height), (0, 0, 255), 2)
         # Retorna a imagem com um retângulo na face
         return self.image
@@ -86,17 +86,63 @@ class FaceDetection:
 ````python
     # Função utilizada para aplicar a detecção de faces em vídeos
     def detecting_faces_video(self):
-        # Loop a ser mantido 
+        # Loop a ser mantido enquanto o vídeo estiver aberto
         while self.video.isOpened():
+            # Verificando se cada frame de self.video foi lido e armazenado
+            # ret é um valor booleano que indica se o quadro foi lido
             ret, frame = self.video.read()
+            #  Indica que não foi possível ler o próximo quadro do vídeo.
             if not ret:
                 break
+            # Detectar faces no quadro de imagem frame.
             result = self.detector.detect_faces(frame)
+            # loop sobre cada elemento (dicionário) presente na lista 'result'
             for face in result:
+                # Os valores das chaves 'box' são extraídos e atribuídos às variáveis 
+                # x, y, width e height. Essas informações representam as coordenadas 
+                # e dimensões da caixa delimitadora (retângulo) ao redor da 
+                # face detectada.
                 x, y, w, h = face['box']
+                # Desenha um retângulo na imagem original 
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            # converte o quadro de imagem de formato BGR para o formato RGB
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            #  função geradora, que pode ser iterada para obter cada quadro 
+            #  processado individualmente. 
             yield frame
+````
+
+````python
+    #Função para detecção de faces em sua webcam
+    def detecting_faces_webcam(self):
+        # Inicia sua webcam
+        cap = cv2.VideoCapture(0)
+        # Loop que para quando não for possível ler o próximo frame
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Detecção de rosto usando MTCNN
+            results = self.detector.detect_faces(frame)
+
+            # Desenhar retângulos em torno dos rostos detectados
+            for result in results:
+                x, y, w, h = result['box']
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+            # Mostrar o quadro com os retângulos dos rostos detectados
+            cv2.imshow('Webcam', frame)
+
+            # Condição de saída do loop (pressionando a tecla "q")
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            # Libere os recursos
+            cap.release()
+            cv2.destroyAllWindows()
+````
+
+````python
+
 ````
 # SUMMARY
 
