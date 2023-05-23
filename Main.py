@@ -38,22 +38,18 @@ class FaceDetection:
             if not ret:
                 break
 
-            # Detecção de rosto usando MTCNN
             results = self.detector.detect_faces(frame)
 
-            # Desenhar retângulos em torno dos rostos detectados
             for result in results:
                 x, y, w, h = result['box']
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-            # Mostrar o quadro com os retângulos dos rostos detectados
             cv2.imshow('Webcam', frame)
 
             # Condição de saída do loop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        # Libere os recursos
         cap.release()
         cv2.destroyAllWindows()
 
