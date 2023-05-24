@@ -294,20 +294,20 @@ class FaceDetection:
     def detecting_faces_video(self):
         # Loop to be maintained while the video is open
         while self.video.isOpened():
-            # Verificando se cada frame de self.video foi lido e armazenado
-            # ret é um valor booleano que indica se o quadro foi lido
+            # Checking if each frame of self.video was read and stored
+            # ret is a boolean value that indicates whether the frame was read
             ret, frame = self.video.read()
-            #  Indica que não foi possível ler o próximo quadro do vídeo.
+            # Indicates that the next frame of the video could not be read.
             if not ret:
                 break
-            # Detectar faces no quadro de imagem frame.
+            # Detect faces in picture frame.
             result = self.detector.detect_faces(frame)
-            # loop sobre cada elemento (dicionário) presente na lista 'result'
+            # loop over each element (dictionary) present in the 'result' list
             for face in result:
-                # Os valores das chaves 'box' são extraídos e atribuídos às variáveis 
-                # x, y, width e height. Essas informações representam as coordenadas 
-                # e dimensões da caixa delimitadora (retângulo) ao redor da 
-                # face detectada.
+                # The values of the 'box' keys are extracted and assigned to the variables
+                # x, y, width and height. This information represents the coordinates
+                # and dimensions of the bounding box (rectangle) around the
+                # face detected.
                 x, y, w, h = face['box']
                 # Desenha um retângulo na imagem original 
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
