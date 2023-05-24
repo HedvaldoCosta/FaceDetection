@@ -227,7 +227,16 @@ The application was built aiming at the user's freedom to carry out their tests 
 
 # SOLUTION
 Using the python library, [MTCNN](https://pypi.org/project/mtcnn/), it is possible to apply the face detection function to images and videos, loaded by the library [opencv](https:// docs.opencv.org/4.x/). The demonstration of the images/videos were made within a [streamlit](https://docs.streamlit.io) application.
+**Código:** https://bit.ly/42TpB1T
 
+![image](https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/f10f1bda-93ee-431c-9700-d09d701bdca9)
+
+In certain cases, artificial intelligence (AI) cannot identify the face, and it may be that something is covering a part of the face or even the person is on the side.
+
+![image](https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/ed7ca574-afb2-4701-9d0a-bde9010bfb8a)
+
+Cutting the video frame by frame, it is necessary to apply the face detection function to each frame for the MTCNN function to work within a video.
+![2023-05-23-14-16-03](https://github.com/HedvaldoCosta/FaceDetection/assets/67663958/1b4bef45-bf42-498d-8c77-b39d6fab34bc)
 # TOOLS
 pycharm community Edition 2023.1
 
