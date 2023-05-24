@@ -211,7 +211,7 @@ if __name__ == '__main__':
 ````python
     # Criação de um título para a parte de webcam
     st.sidebar.title("WEBCAM")
-    # Butão criado para iniciar a webcam
+    # Botão criado para iniciar a webcam
     start_webcam_button = st.sidebar.button("INICIAR WEBCAM")
     # Caso o botão seja apertado, irá chamar a classe FaceDetection executando a função
     # para detecção de faces na webcam
@@ -349,36 +349,36 @@ class FaceDetection:
 
 ````python
 if __name__ == '__main__':
-    # Criação de um título para vídeos na barra lateral
+    # Creating a title for videos in the sidebar
     st.sidebar.title("ESCOLHA UM VÍDEO")
-    # Função que dá permissão ao usuário para carregar seus próprios vídeos
+    # Function that gives user permission to upload their own videos
     uploaded_file = st.sidebar.file_uploader("", type=["mp4", "avi"])
     if uploaded_file is not None:
-        # Cria um arquivo temporário
+        # Create a temporary file
         temp_file = tempfile.NamedTemporaryFile(delete=False)
-        # Escreve a string como Bytes no arquivo temporário
+        # Write the string as Bytes in the temp file
         temp_file.write(uploaded_file.read())
-        # Recebe o nome do arquivo temporário e o fecha
+        # Get the name of the temporary file and close it
         video_path = temp_file.name
         temp_file.close()
-        # Capturar fluxos de vídeo de arquivos de vídeo
+        # Capture video streams from video files
         video = cv2.VideoCapture(video_path)
-        # Retonar a classe FaceDetection recebendo o parâmetro "video"
+        # Return the FaceDetection class receiving the "video" parameter
         face_detection_video = FaceDetection(file_video=video)
-        # Inicia a função para detecção em vídeos
+        # Start the function for detection in videos
         video_generator = face_detection_video.detecting_faces_video()
-        # Criar e atualizar elementos de exibição interativos em aplicativos 
+        # Create and update interactive display elements in apps
         stframe = st.empty()
         while True:
             try:
-                # Obter o próximo quadro do vídeo
+                # Get the next frame of the video
                 frame = next(video_generator)
-                # Exibir o quadro na interface
+                # Display the frame in the interface
                 stframe.image(frame, channels="RGB")
-            # Indicar o final de uma iteração
+            # Indicate the end of an iteration
             except StopIteration:
                 break
-    # Possibilidade de testar vídeos já carregados dentro da aplicação
+    # Possibility to test videos already loaded inside the application
     st.sidebar.info("Sem arquivos? escolha aqui")
     video_choice = {'PARAR': '',
                     'Vídeo 1': 'https://bit.ly/436YGiF',
@@ -399,28 +399,28 @@ if __name__ == '__main__':
 ````
 
 ````python
-    # Criação de um título para imagens na barra lateral
+    # Creating a title for images in the sidebar
     st.sidebar.title("ESCOLHA UMA IMAGEM")
-    # Função para carregar imagens em seu próprio dispositivo
+    # Function to load images on your own device
     upload_image = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
     if upload_image is not None:
-        # Decodificar e ler a imagem representada pelo array NumPy
+        # Decode and read the image represented by the NumPy array
         image = cv2.imdecode(np.fromstring(upload_image.read(), np.uint8), 1)
-        # Chama a classe FaceDetection com o parâmetro "image"
+        # Call the FaceDetection class with the "image" parameter
         face_detection_image = FaceDetection(file_image=image)
-        # Executa a função de detecção de faces em imagens
+        # Perform face detection function on images
         image_generator = face_detection_image.detecting_faces_image()
-        # Retorna a imagem na aplicação
+        # Returns the image in the application
         st.image(image_generator, channels="BGR")
 ````
 
 ````python
-    # Criação de um título para a parte de webcam
+    # Creating a title for the webcam part
     st.sidebar.title("WEBCAM")
-    # Butão criado para iniciar a webcam
+    # Button created to start the webcam
     start_webcam_button = st.sidebar.button("INICIAR WEBCAM")
-    # Caso o botão seja apertado, irá chamar a classe FaceDetection executando a função
-    # para detecção de faces na webcam
+    # If the button is pressed, it will call the FaceDetection class executing the function
+    # for webcam face detection
     if start_webcam_button:
         face_detection_webcam = FaceDetection()
         face_detection_webcam.detecting_faces_webcam()
