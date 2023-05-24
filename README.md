@@ -309,40 +309,40 @@ class FaceDetection:
                 # and dimensions of the bounding box (rectangle) around the
                 # face detected.
                 x, y, w, h = face['box']
-                # Desenha um retângulo na imagem original 
+                # Draw a rectangle on the original image
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            # converte o quadro de imagem de formato BGR para o formato RGB
+            # Convert image frame from BGR format to RGB format
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            #  função geradora, que pode ser iterada para obter cada quadro 
-            #  processado individualmente. 
+            # Generator function, which can be iterated to get each frame
+            # Processed individually.
             yield frame
 ````
 
 ````python
-    #Função para detecção de faces em sua webcam
+    # Function to detect faces on your webcam
     def detecting_faces_webcam(self):
-        # Inicia sua webcam
+        # Start your webcam
         cap = cv2.VideoCapture(0)
-        # Loop que para quando não for possível ler o próximo frame
+        # Loop that stops when it is not possible to read the next frame
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
-            # Detecção de rosto usando MTCNN
+            # Face detection using MTCNN
             results = self.detector.detect_faces(frame)
 
-            # Desenhar retângulos em torno dos rostos detectados
+            # Draw rectangles around detected faces
             for result in results:
                 x, y, w, h = result['box']
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-            # Mostrar o quadro com os retângulos dos rostos detectados
+            # Show the frame with the rectangles of the detected faces
             cv2.imshow('Webcam', frame)
 
-            # Condição de saída do loop (pressionando a tecla "q")
+            # Loop exit condition (by pressing "q" key)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            # Libere os recursos
+            # Release the resources
             cap.release()
             cv2.destroyAllWindows()
 ````
